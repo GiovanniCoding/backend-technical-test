@@ -24,7 +24,6 @@ class Settings:
         f"db+postgresql://{ DB_USER }:{ DB_PASSWORD }@{ DB_HOSTNAME }:{ DB_PORT }/{ DB_DATABASE }"
     )
 
-
     # AWS
     AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID", "")
     AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")

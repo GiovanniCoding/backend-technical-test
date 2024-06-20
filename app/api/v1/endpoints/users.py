@@ -1,19 +1,12 @@
 from uuid import UUID
-from fastapi import HTTPException
-from fastapi import APIRouter, Depends, status
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.security import (
-    get_current_admin_user,
-    get_current_user,
-)
+from app.core.security import get_current_admin_user, get_current_user
 from app.db.database import get_db
 from app.db.models.user import User, UserRepository
-from app.schemas.user import (
-    UserResponse,
-    PatchUserRequest,
-    UserDeletedResponse,
-)
+from app.schemas.user import PatchUserRequest, UserDeletedResponse, UserResponse
 
 router = APIRouter()
 
@@ -25,13 +18,17 @@ def get_me(user: User = Depends(get_current_user)):
     """
     return user
 
+
 @router.get("/users/{id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
-def get_users(id: UUID, db: Session = Depends(get_db), _: User = Depends(get_current_admin_user)):
+def get_users(
+    id: UUID, db: Session = Depends(get_db), _: User = Depends(get_current_admin_user)
+):
     """
     Get a users (admin only)
     """
     user_repositoy = UserRepository(db)
     return user_repositoy.get_by_id(id)
+
 
 @router.get("/users", response_model=list[UserResponse], status_code=status.HTTP_200_OK)
 def get_users(db: Session = Depends(get_db), _: User = Depends(get_current_admin_user)):
@@ -42,7 +39,10 @@ def get_users(db: Session = Depends(get_db), _: User = Depends(get_current_admin
     users = user_repositoy.list()
     return [UserResponse(**user.as_dict()) for user in users]
 
-@router.patch("/users/{id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+
+@router.patch(
+    "/users/{id}", response_model=UserResponse, status_code=status.HTTP_200_OK
+)
 def update_user(
     id: UUID,
     request: PatchUserRequest,
@@ -56,7 +56,12 @@ def update_user(
     user = user_repositoy.update(id, request.as_dict())
     return UserResponse(**user.as_dict())
 
-@router.delete("/users/{id}", response_model=UserDeletedResponse, status_code=status.HTTP_202_ACCEPTED)
+
+@router.delete(
+    "/users/{id}",
+    response_model=UserDeletedResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
 def delete_user(
     id: UUID,
     db: Session = Depends(get_db),
@@ -70,7 +75,7 @@ def delete_user(
     if not existing_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id '{id}' not found."
+            detail=f"User with id '{id}' not found.",
         )
     response = user_repositoy.delete(id)
     return UserDeletedResponse(

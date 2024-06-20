@@ -1,5 +1,5 @@
 from typing import Annotated
-from app.helpers.helpers import validate_email
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -12,13 +12,11 @@ from app.core.security import (
 )
 from app.db.database import get_db
 from app.db.models.user import User, UserRepository
-from app.schemas.auth import (
-    TokenResponse,
-    UserCreateRequest,
-    UserResponse,
-)
+from app.helpers.helpers import validate_email
+from app.schemas.auth import TokenResponse, UserCreateRequest, UserResponse
 
 router = APIRouter()
+
 
 @router.post("/login", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 def login(
@@ -43,6 +41,7 @@ def login(
     access_token = create_access_token(data={"sub": user.username})
     return TokenResponse(access_token=access_token, token_type="bearer")
 
+
 @router.post(
     "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
 )
@@ -55,7 +54,9 @@ def register_user(
     Create a new user (admin only)
     """
     user_repository = UserRepository(db)
-    if user_repository.get_by_username(request.username) or user_repository.get_by_email(request.email):
+    if user_repository.get_by_username(
+        request.username
+    ) or user_repository.get_by_email(request.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username or Email already registered",
@@ -73,5 +74,5 @@ def register_user(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred. Please try again later."
+            detail="An unexpected error occurred. Please try again later.",
         )

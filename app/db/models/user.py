@@ -1,5 +1,6 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from uuid import UUID
+
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import Session
 
@@ -29,7 +30,12 @@ class UserRepository:
         self.db = db
 
     def create(
-        self, email: str, username: str, hashed_password: str, is_active: bool, is_admin: bool
+        self,
+        email: str,
+        username: str,
+        hashed_password: str,
+        is_active: bool,
+        is_admin: bool,
     ) -> User:
         user = User(
             email=email,
@@ -42,33 +48,46 @@ class UserRepository:
         self.db.commit()
         self.db.refresh(user)
         return user
-    
+
     def get_by_id(self, user_id: UUID) -> User:
-        return self.db.query(User).filter(
-            User.id == user_id,
-            User.deleted_at == None,
-        ).first()
-    
+        return (
+            self.db.query(User)
+            .filter(
+                User.id == user_id,
+                User.deleted_at == None,
+            )
+            .first()
+        )
+
     def get_admins(self) -> list[User]:
-        return self.db.query(User).filter(
-            User.is_admin == True,
-            User.deleted_at == None
-        ).all()
+        return (
+            self.db.query(User)
+            .filter(User.is_admin == True, User.deleted_at == None)
+            .all()
+        )
 
     def get_by_email(self, email: str) -> User:
-        return self.db.query(User).filter(
-            User.email == email,
-            User.deleted_at == None,
-        ).first()
+        return (
+            self.db.query(User)
+            .filter(
+                User.email == email,
+                User.deleted_at == None,
+            )
+            .first()
+        )
 
     def get_by_username(self, username: str) -> User:
-        return self.db.query(User).filter(
-            User.username == username,
-            User.deleted_at == None,
-        ).first()
+        return (
+            self.db.query(User)
+            .filter(
+                User.username == username,
+                User.deleted_at == None,
+            )
+            .first()
+        )
 
     def update(self, user_id: UUID, data: dict) -> User:
-        data['updated_at'] = datetime.now(UTC)
+        data["updated_at"] = datetime.now(UTC)
         user = self.get_by_id(user_id)
         for key, value in data.items():
             if value is not None:
@@ -79,13 +98,17 @@ class UserRepository:
 
     def delete(self, user_id: UUID) -> User:
         user = self.get_by_id(user_id)
-        setattr(user, 'deleted_at', datetime.now(UTC))
+        setattr(user, "deleted_at", datetime.now(UTC))
         self.db.commit()
         self.db.refresh(user)
         return user
-    
+
     def list(self) -> list[User]:
-        return self.db.query(User).filter(
-            User.deleted_at == None,
-            User.is_active == True,
-        ).all()
+        return (
+            self.db.query(User)
+            .filter(
+                User.deleted_at == None,
+                User.is_active == True,
+            )
+            .all()
+        )

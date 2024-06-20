@@ -1,11 +1,12 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
-from app.db.models.user import UserRepository
+
 import jwt
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 from app.core.config import settings
+from app.db.models.user import UserRepository
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

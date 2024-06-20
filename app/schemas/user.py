@@ -1,7 +1,9 @@
-from uuid import UUID
 from datetime import datetime
-from pydantic import BaseModel
 from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel
+
 
 class UserResponse(BaseModel):
     id: UUID
@@ -13,9 +15,11 @@ class UserResponse(BaseModel):
     updated_at: datetime
     deleted_at: Optional[datetime] = None
 
+
 class UserDeletedResponse(BaseModel):
     id: UUID
     deleted_at: datetime
+
 
 class PatchUserRequest(BaseModel):
     email: Optional[str] = None
@@ -26,9 +30,9 @@ class PatchUserRequest(BaseModel):
 
     def as_dict(self) -> dict:
         return {
-            'email': self.email,
-            'username': self.username,
-            'is_active': self.is_active,
-            'is_admin': self.is_admin,
-            'password': self.password,
+            "email": self.email,
+            "username": self.username,
+            "is_active": self.is_active,
+            "is_admin": self.is_admin,
+            "password": self.password,
         }

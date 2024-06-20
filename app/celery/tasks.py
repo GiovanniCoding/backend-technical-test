@@ -1,5 +1,6 @@
-from app.celery.celery_config import celery_app
 import boto3
+
+from app.celery.celery_config import celery_app
 from app.core.config import settings
 
 ses_client = boto3.client(
@@ -39,17 +40,17 @@ def send_email(self, email, subject, html_body):
                 "ToAddresses": [email],
             },
             Message={
-            "Body": {
-                "Html": {
+                "Body": {
+                    "Html": {
+                        "Charset": CHARSET,
+                        "Data": html_body,
+                    }
+                },
+                "Subject": {
                     "Charset": CHARSET,
-                    "Data": html_body,
-                }
+                    "Data": subject,
+                },
             },
-            "Subject": {
-                "Charset": CHARSET,
-                "Data": subject,
-            },
-        },
             Source="egiovanni.vo@gmail.com",
         )
         print(f"Email sent! Message ID: {response['MessageId']} to {email}")
@@ -101,7 +102,7 @@ def get_email_content(reason, product_name):
         )
     return (
         "No subject",
-            f"""
+        f"""
                 <html>
                     <head></head>
                     <h1 style='text-align:center'>Amazing Store</h1>
