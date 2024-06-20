@@ -37,3 +37,21 @@ class ProductRepository:
     
     def find_by_sku(self, sku: str) -> Product:
         return self.db.query(Product).filter(Product.sku == sku).first()
+    
+    def update(self, product: Product, data: dict) -> Product:
+        data['updated_at'] = datetime.now(UTC)
+        for key, value in data.items():
+            if value is not None:
+                setattr(product, key, value)
+        self.db.commit()
+        self.db.refresh(product)
+        return product
+    
+    def delete(self, product: Product) -> Product:
+        setattr(product, 'deleted_at', datetime.now(UTC))
+        self.db.commit()
+        self.db.refresh(product)
+        return product
+    
+    def list(self) -> list[Product]:
+        return self.db.query(Product).all()

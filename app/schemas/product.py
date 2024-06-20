@@ -33,3 +33,27 @@ class ProductResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
+
+class PatchProductRequest(BaseModel):
+    sku: Optional[str] = None
+    name: Optional[str] = None
+    price: Optional[float] = None
+    brand: Optional[str] = None
+
+    def as_dict(self) -> dict:
+        return {
+            "sku": self.sku,
+            "name": self.name,
+            "price": self.price,
+            "brand": self.brand,
+        }
+    
+    @field_validator('name')
+    def validate_name(cls, v):
+        if not v or not (1 <= len(v) <= 100):
+            raise ValueError('Name must be between 1 and 100 characters')
+        return v
+
+class UserDeletedResponse(BaseModel):
+    id: UUID
+    deleted_at: datetime
