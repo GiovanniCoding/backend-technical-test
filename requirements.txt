@@ -1,2 +1,9 @@
 fastapi==0.111.0
+sqlalchemy==2.0.31
+pyjwt==2.8.0
+passlib[bcrypt]==1.7.4
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# dev
 black==24.4.2
