@@ -44,7 +44,10 @@ class UserRepository:
         return user
     
     def get_by_id(self, user_id: UUID) -> User:
-        return self.db.query(User).filter(User.id == user_id).first()
+        return self.db.query(User).filter(
+            User.id == user_id,
+            User.deleted_at == None,
+        ).first()
     
     def get_admins(self) -> list[User]:
         return self.db.query(User).filter(
@@ -53,10 +56,16 @@ class UserRepository:
         ).all()
 
     def get_by_email(self, email: str) -> User:
-        return self.db.query(User).filter(User.email == email).first()
+        return self.db.query(User).filter(
+            User.email == email,
+            User.deleted_at == None,
+        ).first()
 
     def get_by_username(self, username: str) -> User:
-        return self.db.query(User).filter(User.username == username).first()
+        return self.db.query(User).filter(
+            User.username == username,
+            User.deleted_at == None,
+        ).first()
 
     def update(self, user_id: UUID, data: dict) -> User:
         data['updated_at'] = datetime.now(UTC)
@@ -74,3 +83,9 @@ class UserRepository:
         self.db.commit()
         self.db.refresh(user)
         return user
+    
+    def list(self) -> list[User]:
+        return self.db.query(User).filter(
+            User.deleted_at == None,
+            User.is_active == True,
+        ).all()

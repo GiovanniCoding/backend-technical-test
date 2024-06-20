@@ -1,21 +1,31 @@
 from app.celery.celery_config import celery_app
 import boto3
+from app.core.config import settings
 
-ses_client = boto3.client("ses", region_name="us-east-1")
+ses_client = boto3.client(
+    "ses",
+    region_name="us-east-1",
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+)
 
 
 @celery_app.task
-def notify_users(email_list: list, reason: str):
+def notify_users(email_list: list, reason: str, product_name: str):
     """
     Task to notify multiple users.
     email_list is a list of the emails to notify.
     """
-    subject, body = get_email_content(reason)
-    for email in email_list:
-        send_email.delay(email, subject, body)
+    try:
+        print(f"Sending email to {email_list} for reason {reason}")
+        subject, body = get_email_content(reason, product_name)
+        for email in email_list:
+            send_email.delay(email, subject, body)
+    except Exception as exc:
+        print(f"Failed to send email to {email_list}: {str(exc)}")
 
 
-@celery_app.task(bind=True, max_retries=10, default_retry_delay=5)
+@celery_app.task(bind=True, max_retries=5, default_retry_delay=5)
 def send_email(self, email, subject, html_body):
     """
     Send an email to a single user.

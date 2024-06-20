@@ -33,6 +33,7 @@ def create_root_user():
             return
         user_repository = UserRepository(db)
         user_repository.create(
+            email="root@email.com",
             username="root",
             hashed_password="$2b$12$K6C642APMSAqBPn/AAA7LOJp1.syvOXIl3PWM5TaKlZ2ugd.SU/yC",
             is_active=True,

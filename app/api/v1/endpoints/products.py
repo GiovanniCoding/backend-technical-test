@@ -32,7 +32,7 @@ def create_product(request: CreateProductRequest, db: Session = Depends(get_db),
         product = product_repository.create(request.as_dict())
         admins = user_repository.get_admins()
         email_list = [admin.email for admin in admins]
-        notify_users.delay(email_list, 'create')
+        notify_users.delay(email_list, 'create', product.name)
         return ProductResponse(**product.as_dict())
     except IntegrityError:
         db.rollback()
@@ -98,7 +98,7 @@ def update_product(
         product = product_repository.update(product, request.as_dict())
         admins = user_repository.get_admins()
         email_list = [admin.email for admin in admins]
-        notify_users.delay(email_list, 'update')
+        notify_users.delay(email_list, 'update', product.name)
         return ProductResponse(**product.as_dict())
     except IntegrityError:
         db.rollback()
@@ -131,12 +131,12 @@ def delete_product(product_sku: str, db: Session = Depends(get_db), _: User = De
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Product with sku '{product_sku}' not found."
         )
-    
+
     try:
         product = product_repository.delete(product)
         admins = user_repository.get_admins()
         email_list = [admin.email for admin in admins]
-        notify_users.delay(email_list, 'create')
+        notify_users.delay(email_list, 'create', product.name)
         return ProductResponse(**product.as_dict())
     except IntegrityError:
         db.rollback()

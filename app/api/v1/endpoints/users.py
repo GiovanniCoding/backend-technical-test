@@ -1,5 +1,5 @@
 from uuid import UUID
-
+from fastapi import HTTPException
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
@@ -33,6 +33,15 @@ def get_users(id: UUID, db: Session = Depends(get_db), _: User = Depends(get_cur
     user_repositoy = UserRepository(db)
     return user_repositoy.get_by_id(id)
 
+@router.get("/users", response_model=list[UserResponse], status_code=status.HTTP_200_OK)
+def get_users(db: Session = Depends(get_db), _: User = Depends(get_current_admin_user)):
+    """
+    Get all users (admin only)
+    """
+    user_repositoy = UserRepository(db)
+    users = user_repositoy.list()
+    return [UserResponse(**user.as_dict()) for user in users]
+
 @router.patch("/users/{id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def update_user(
     id: UUID,
@@ -57,6 +66,12 @@ def delete_user(
     Delete a user (admin only)
     """
     user_repositoy = UserRepository(db)
+    existing_user = user_repositoy.get_by_id(id)
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id '{id}' not found."
+        )
     response = user_repositoy.delete(id)
     return UserDeletedResponse(
         id=response.id,
