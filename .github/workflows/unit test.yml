@@ -24,7 +24,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        export PYTHONPATH=.
+    - name: Set up environment
+      run: |
+        export PYTHONPATH=$PYTHONPATH:${{ github.workspace }}
     - name: Lint with black
       run: |
         pytest .
