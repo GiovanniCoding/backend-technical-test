@@ -43,6 +43,12 @@ class UserRepository:
     def get_by_id(self, user_id: UUID) -> User:
         return self.db.query(User).filter(User.id == user_id).first()
     
+    def get_admins(self) -> list[User]:
+        return self.db.query(User).filter(
+            User.is_admin == True,
+            User.deleted_at == None
+        ).all()
+
     def get_by_username(self, username: str) -> User:
         return self.db.query(User).filter(User.username == username).first()
 

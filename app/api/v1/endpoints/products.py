@@ -1,7 +1,7 @@
 from app.core.security import (
     get_current_admin_user
 )
-from app.celery.tasks import notify_admins
+from app.celery.tasks import notify_users
 from app.db.models.user import User
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models.product import ProductRepository
+from app.db.models.user import UserRepository
 from app.schemas.product import CreateProductRequest, ProductResponse, PatchProductRequest
 
 router = APIRouter()
@@ -19,6 +20,7 @@ def create_product(request: CreateProductRequest, db: Session = Depends(get_db),
     Create a product
     """
     product_repository = ProductRepository(db)
+    user_repository = UserRepository(db)
     existing_product = product_repository.find_by_sku(request.sku)
     if existing_product:
         raise HTTPException(
@@ -28,7 +30,9 @@ def create_product(request: CreateProductRequest, db: Session = Depends(get_db),
     
     try:
         product = product_repository.create(request.as_dict())
-        notify_admins.delay()
+        admins = user_repository.get_admins()
+        email_list = [admin.username for admin in admins]
+        notify_users.delay(email_list, 'create')
         return ProductResponse(**product.as_dict())
     except IntegrityError:
         db.rollback()
@@ -82,6 +86,7 @@ def update_product(
     Update a product
     """
     product_repository = ProductRepository(db)
+    user_repository = UserRepository(db)
     product = product_repository.find_by_sku(product_sku)
     if not product:
         raise HTTPException(
@@ -91,6 +96,9 @@ def update_product(
     
     try:
         product = product_repository.update(product, request.as_dict())
+        admins = user_repository.get_admins()
+        email_list = [admin.username for admin in admins]
+        notify_users.delay(email_list, 'update')
         return ProductResponse(**product.as_dict())
     except IntegrityError:
         db.rollback()
@@ -116,6 +124,7 @@ def delete_product(product_sku: str, db: Session = Depends(get_db), _: User = De
     Delete a product
     """
     product_repository = ProductRepository(db)
+    user_repository = UserRepository(db)
     product = product_repository.find_by_sku(product_sku)
     if not product:
         raise HTTPException(
@@ -125,6 +134,9 @@ def delete_product(product_sku: str, db: Session = Depends(get_db), _: User = De
     
     try:
         product = product_repository.delete(product)
+        admins = user_repository.get_admins()
+        email_list = [admin.username for admin in admins]
+        notify_users.delay(email_list, 'create')
         return ProductResponse(**product.as_dict())
     except IntegrityError:
         db.rollback()
