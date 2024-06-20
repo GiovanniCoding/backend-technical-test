@@ -1,6 +1,7 @@
 from uuid import UUID
-
-from pydantic import BaseModel, EmailStr
+from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional
 
 
 class UserBase(BaseModel):
@@ -28,3 +29,21 @@ class UserResponse(BaseModel):
     username: str
     is_active: bool
     is_admin: bool
+
+class UserDeletedResponse(UserBase):
+    id: UUID
+    deleted_at: datetime
+
+class PatchUserRequest(BaseModel):
+    username: Optional[str] = None
+    is_active: Optional[bool] = None
+    is_admin: Optional[bool] = None
+    password: Optional[str] = None
+
+    def as_dict(self) -> dict:
+        return {
+            'username': self.username,
+            'is_active': self.is_active,
+            'is_admin': self.is_admin,
+            'password': self.password,
+        }

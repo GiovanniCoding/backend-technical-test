@@ -1,3 +1,5 @@
+from datetime import datetime, UTC
+from uuid import UUID
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import Session
 
@@ -34,6 +36,26 @@ class UserRepository:
             is_admin=is_admin,
         )
         self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+    
+    def get_by_id(self, user_id: UUID) -> User:
+        return self.db.query(User).filter(User.id == user_id).first()
+    
+    def update(self, user_id: UUID, data: dict) -> User:
+        data['updated_at'] = datetime.now(UTC)
+        user = self.get_by_id(user_id)
+        for key, value in data.items():
+            if value is not None:
+                setattr(user, key, value)
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def delete(self, user_id: UUID) -> User:
+        user = self.get_by_id(user_id)
+        setattr(user, 'deleted_at', datetime.now(UTC))
         self.db.commit()
         self.db.refresh(user)
         return user
