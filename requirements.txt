@@ -10,3 +10,5 @@ boto3==1.34.130
 
 # dev
 black==24.4.2
+pytest==8.2.2
+mock==5.1.0
