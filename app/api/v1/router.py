@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from .endpoints import health, auth
+
+from .endpoints import auth, health
 
 router = APIRouter(
     prefix="/v1",

@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+
 from app.api.v1.router import router as api_v1_router
 from app.core.config import settings
-from app.db.database import run_migrations, create_root_user
+from app.db.database import create_root_user, run_migrations
 
 run_migrations()
 create_root_user()
