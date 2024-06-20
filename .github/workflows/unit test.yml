@@ -27,6 +27,6 @@ jobs:
     - name: Set up environment
       run: |
         export PYTHONPATH=$PYTHONPATH:${{ github.workspace }}
-    - name: Lint with black
+    - name: Run tests
       run: |
         pytest .
