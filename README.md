@@ -30,6 +30,11 @@ It implements a REST API using:
 5. API Documentation:
     * The system uses FastAPI, which provides automatically generated interactive API documentation.
 
+## CI
+Github Actions was used to control the CI, for this 2 tasks were created:
+* To be able to maintain the quality of the code using Linter (Black).
+* An action was created to run the unit tests and verify the functionality of the code.
+
 # Setup and Installation
 ## Requirements
     * Docker and Docker Compose
