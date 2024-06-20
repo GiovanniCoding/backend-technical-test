@@ -28,7 +28,8 @@ def login(
     """
     Get an access token for the user
     """
-    user = db.query(User).filter(User.username == form_data.username).first()
+    user_repository = UserRepository(db)
+    user = user_repository.get_by_username(form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -50,19 +51,23 @@ def register_user(
     """
     Create a new user (admin only)
     """
-
-    user = db.query(User).filter(User.username == request.username).first()
-    if user:
+    user_repository = UserRepository(db)
+    if user_repository.get_by_username(request.username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
 
-    user_repositoy = UserRepository(db)
-    new_user = user_repositoy.create(
-        username=request.username,
-        hashed_password=get_password_hash(request.password),
-        is_active=request.is_active,
-        is_admin=request.is_admin,
-    )
-    return UserResponse(**new_user.as_dict())
+    try:
+        new_user = user_repository.create(
+            username=request.username,
+            hashed_password=get_password_hash(request.password),
+            is_active=request.is_active,
+            is_admin=request.is_admin,
+        )
+        return UserResponse(**new_user.as_dict())
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred. Please try again later."
+        )
