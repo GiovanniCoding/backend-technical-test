@@ -4,6 +4,8 @@ pyjwt==2.8.0
 passlib[bcrypt]==1.7.4
 alembic==1.13.1
 psycopg2-binary==2.9.9
+celery==5.4.0
+redis==5.0.6
 
 # dev
 black==24.4.2

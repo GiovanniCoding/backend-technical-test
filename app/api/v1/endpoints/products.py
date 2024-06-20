@@ -1,6 +1,7 @@
 from app.core.security import (
     get_current_admin_user
 )
+from app.celery.tasks import notify_admins
 from app.db.models.user import User
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
@@ -27,6 +28,7 @@ def create_product(request: CreateProductRequest, db: Session = Depends(get_db),
     
     try:
         product = product_repository.create(request.as_dict())
+        notify_admins.delay()
         return ProductResponse(**product.as_dict())
     except IntegrityError:
         db.rollback()
@@ -45,7 +47,6 @@ def create_product(request: CreateProductRequest, db: Session = Depends(get_db),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred: {str(e)}"
         )
-
 
 @router.get("/products/{product_sku}", response_model=ProductResponse)
 def get_product(product_sku: str, db: Session = Depends(get_db)):

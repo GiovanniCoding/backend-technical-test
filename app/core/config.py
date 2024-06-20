@@ -19,5 +19,10 @@ class Settings:
         f"postgresql://{ DB_USER }:{ DB_PASSWORD }@{ DB_HOSTNAME }:{ DB_PORT }/{ DB_DATABASE }"
     )
 
+    CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+    CELERY_RESULT_BACKEND: str = (
+        f"db+postgresql://{ DB_USER }:{ DB_PASSWORD }@{ DB_HOSTNAME }:{ DB_PORT }/{ DB_DATABASE }"
+    )
+
 
 settings = Settings()

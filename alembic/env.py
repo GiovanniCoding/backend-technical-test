@@ -31,6 +31,24 @@ target_metadata = [Base.metadata]
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+IGNORE_TABLES = ["celery_taskmeta", "celery_tasksetmeta"]
+
+
+def include_object(object, name, type_, reflected, compare_to):
+    """
+    Should you include this table or not?
+    """
+
+    if type_ == "table" and (
+        name in IGNORE_TABLES or object.info.get("skip_autogenerate", False)
+    ):
+        return False
+
+    elif type_ == "column" and object.info.get("skip_autogenerate", False):
+        return False
+
+    return True
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -70,7 +88,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(connection=connection, target_metadata=target_metadata, include_object=include_object,)
 
         with context.begin_transaction():
             context.run_migrations()
