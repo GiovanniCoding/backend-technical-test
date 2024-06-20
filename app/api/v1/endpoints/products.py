@@ -47,7 +47,7 @@ def create_product(request: CreateProductRequest, db: Session = Depends(get_db),
         )
 
 
-@router.get("/products/{product_id}", response_model=ProductResponse)
+@router.get("/products/{product_sku}", response_model=ProductResponse)
 def get_product(product_sku: str, db: Session = Depends(get_db)):
     """
     Get a product by sku
@@ -70,7 +70,7 @@ def list_products(db: Session = Depends(get_db)):
     products = product_repository.list()
     return [ProductResponse(**product.as_dict()) for product in products]
 
-@router.patch("/products/{product_id}", response_model=ProductResponse)
+@router.patch("/products/{product_sku}", response_model=ProductResponse)
 def update_product(
     product_sku: str,
     request: PatchProductRequest,
@@ -109,7 +109,7 @@ def update_product(
             detail=f"An unexpected error occurred: {str(e)}"
         )
 
-@router.delete("/products/{product_id}", response_model=ProductResponse)
+@router.delete("/products/{product_sku}", response_model=ProductResponse)
 def delete_product(product_sku: str, db: Session = Depends(get_db), _: User = Depends(get_current_admin_user)):
     """
     Delete a product

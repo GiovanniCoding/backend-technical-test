@@ -56,4 +56,8 @@ def delete_user(
     Delete a user (admin only)
     """
     user_repositoy = UserRepository(db)
-    return user_repositoy.delete(id)
+    response = user_repositoy.delete(id)
+    return UserDeletedResponse(
+        id=response.id,
+        deleted_at=response.deleted_at,
+    )

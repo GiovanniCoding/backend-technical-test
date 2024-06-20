@@ -12,9 +12,9 @@ from app.core.security import (
 )
 from app.db.database import get_db
 from app.db.models.user import User, UserRepository
-from app.schemas.user import (
+from app.schemas.auth import (
     TokenResponse,
-    UserCreate,
+    UserCreateRequest,
     UserResponse,
 )
 
@@ -43,7 +43,7 @@ def login(
     "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
 )
 def register_user(
-    request: UserCreate,
+    request: UserCreateRequest,
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin_user),
 ):
@@ -65,4 +65,4 @@ def register_user(
         is_active=request.is_active,
         is_admin=request.is_admin,
     )
-    return new_user
+    return UserResponse(**new_user.as_dict())
