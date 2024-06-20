@@ -81,9 +81,15 @@ def list_products(db: Session = Depends(get_db)):
     """
     List all products
     """
-    product_repository = ProductRepository(db)
-    products = product_repository.list()
-    return [ProductResponse(**product.as_dict()) for product in products]
+    try:
+        product_repository = ProductRepository(db)
+        products = product_repository.list()
+        return [ProductResponse(**product.as_dict()) for product in products]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}",
+        )
 
 
 @router.patch("/products/{product_sku}", response_model=ProductResponse)

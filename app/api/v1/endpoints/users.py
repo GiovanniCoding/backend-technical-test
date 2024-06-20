@@ -52,9 +52,27 @@ def update_user(
     """
     Update a user (admin only)
     """
-    user_repositoy = UserRepository(db)
-    user = user_repositoy.update(id, request.as_dict())
-    return UserResponse(**user.as_dict())
+    try:
+        existing_user = UserRepository(db).get_by_email(request.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"User with email '{request.email}' already exists.",
+            )
+        existing_user = UserRepository(db).get_by_username(request.username)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"User with username '{request.username}' already exists.",
+            )
+        user_repositoy = UserRepository(db)
+        user = user_repositoy.update(id, request.as_dict())
+        return UserResponse(**user.as_dict())
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.delete(

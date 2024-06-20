@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import Column, Float, String
+from sqlalchemy import Column, Float, String, Integer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -16,6 +16,7 @@ class Product(BaseModel):
     name = Column(String, nullable=False)
     price = Column(Float, nullable=False)
     brand = Column(String, nullable=False)
+    visit_count = Column(Integer, default=0)
 
     def as_dict(self) -> dict:
         return super().as_dict() | {
@@ -23,6 +24,7 @@ class Product(BaseModel):
             "name": self.name,
             "price": self.price,
             "brand": self.brand,
+            "visit_count": self.visit_count,
         }
 
 
@@ -38,7 +40,15 @@ class ProductRepository:
         return product
 
     def find_by_sku(self, sku: str) -> Product:
-        return self.db.query(Product).filter(Product.sku == sku).first()
+        product = self.db.query(Product).filter(
+            Product.sku == sku,
+            Product.deleted_at == None,
+        ).first()
+        if product:
+            product.visit_count += 1
+            self.db.commit()
+            self.db.refresh(product)
+        return product
 
     def update(self, product: Product, data: dict) -> Product:
         data["updated_at"] = datetime.now(UTC)
@@ -56,4 +66,10 @@ class ProductRepository:
         return product
 
     def list(self) -> list[Product]:
-        return self.db.query(Product).all()
+        products = self.db.query(Product).filter(
+            Product.deleted_at == None,
+        ).all()
+        for product in products:
+            product.visit_count += 1
+        self.db.commit()
+        return products

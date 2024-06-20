@@ -12,7 +12,7 @@ down:
 	docker compose down
 
 restart-server:
-	docker compose restart main
+	docker compose restart server
 
 restart-worker:
 	docker compose restart worker
@@ -21,7 +21,7 @@ stop:
 	docker compose stop
 
 migrate:
-	docker compose run --rm main alembic upgrade head
+	docker compose run --rm server alembic upgrade head
 
 migrations:
-	docker compose run --rm main alembic revision --autogenerate
+	docker compose run --rm server alembic revision --autogenerate

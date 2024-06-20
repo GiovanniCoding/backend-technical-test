@@ -34,6 +34,7 @@ class ProductResponse(BaseModel):
     name: str
     price: float
     brand: str
+    visit_count: int
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
