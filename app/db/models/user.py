@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, String
 from sqlalchemy.orm import Session
 
 from app.db.models.base import BaseModel

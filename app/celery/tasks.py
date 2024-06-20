@@ -102,12 +102,12 @@ def get_email_content(reason, product_name):
         )
     return (
         "No subject",
-        f"""
-                <html>
-                    <head></head>
-                    <h1 style='text-align:center'>Amazing Store</h1>
-                    <p>No content available for the specified reason.</p>
-                    </body>
-                </html>
-            """,
+        """
+            <html>
+                <head></head>
+                <h1 style='text-align:center'>Amazing Store</h1>
+                <p>No content available for the specified reason.</p>
+                </body>
+            </html>
+        """,
     )

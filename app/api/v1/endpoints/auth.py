@@ -74,5 +74,5 @@ def register_user(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred. Please try again later.",
+            detail=f"Something went wrong while creating the user: {e}",
         )

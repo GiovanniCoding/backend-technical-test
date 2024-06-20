@@ -1,9 +1,6 @@
 from datetime import UTC, datetime
-from uuid import UUID
 
-from fastapi import HTTPException, status
-from sqlalchemy import Column, Float, String, Integer
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import Column, Float, Integer, String
 from sqlalchemy.orm import Session
 
 from app.db.models.base import BaseModel
@@ -40,10 +37,14 @@ class ProductRepository:
         return product
 
     def find_by_sku(self, sku: str) -> Product:
-        product = self.db.query(Product).filter(
-            Product.sku == sku,
-            Product.deleted_at == None,
-        ).first()
+        product = (
+            self.db.query(Product)
+            .filter(
+                Product.sku == sku,
+                Product.deleted_at == None,
+            )
+            .first()
+        )
         if product:
             product.visit_count += 1
             self.db.commit()
@@ -66,9 +67,13 @@ class ProductRepository:
         return product
 
     def list(self) -> list[Product]:
-        products = self.db.query(Product).filter(
-            Product.deleted_at == None,
-        ).all()
+        products = (
+            self.db.query(Product)
+            .filter(
+                Product.deleted_at == None,
+            )
+            .all()
+        )
         for product in products:
             product.visit_count += 1
         self.db.commit()

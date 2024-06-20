@@ -2,24 +2,20 @@ from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db.models.user import UserRepository
+from app.db.database import get_db
+from app.db.models.user import User, UserRepository
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 SECRET_KEY = settings.SECRET_KEY
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
-
-from app.core.config import settings
-from app.db.database import get_db
-from app.db.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
