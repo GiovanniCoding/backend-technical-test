@@ -5,6 +5,7 @@ from typing import Optional
 
 
 class UserCreateRequest(BaseModel):
+    email: str
     username: str
     password: str
     is_active: bool = True
@@ -18,6 +19,7 @@ class TokenResponse(BaseModel):
 
 class UserResponse(BaseModel):
     id: UUID
+    email: str
     username: str
     is_active: bool
     is_admin: bool

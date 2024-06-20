@@ -28,7 +28,7 @@ def get_me(user: User = Depends(get_current_user)):
 @router.get("/users/{id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def get_users(id: UUID, db: Session = Depends(get_db), _: User = Depends(get_current_admin_user)):
     """
-    Get all users (admin only)
+    Get a users (admin only)
     """
     user_repositoy = UserRepository(db)
     return user_repositoy.get_by_id(id)
@@ -44,7 +44,8 @@ def update_user(
     Update a user (admin only)
     """
     user_repositoy = UserRepository(db)
-    return user_repositoy.update(id, request.as_dict())
+    user = user_repositoy.update(id, request.as_dict())
+    return UserResponse(**user.as_dict())
 
 @router.delete("/users/{id}", response_model=UserDeletedResponse, status_code=status.HTTP_202_ACCEPTED)
 def delete_user(

@@ -31,7 +31,7 @@ def create_product(request: CreateProductRequest, db: Session = Depends(get_db),
     try:
         product = product_repository.create(request.as_dict())
         admins = user_repository.get_admins()
-        email_list = [admin.username for admin in admins]
+        email_list = [admin.email for admin in admins]
         notify_users.delay(email_list, 'create')
         return ProductResponse(**product.as_dict())
     except IntegrityError:
@@ -97,7 +97,7 @@ def update_product(
     try:
         product = product_repository.update(product, request.as_dict())
         admins = user_repository.get_admins()
-        email_list = [admin.username for admin in admins]
+        email_list = [admin.email for admin in admins]
         notify_users.delay(email_list, 'update')
         return ProductResponse(**product.as_dict())
     except IntegrityError:
@@ -135,7 +135,7 @@ def delete_product(product_sku: str, db: Session = Depends(get_db), _: User = De
     try:
         product = product_repository.delete(product)
         admins = user_repository.get_admins()
-        email_list = [admin.username for admin in admins]
+        email_list = [admin.email for admin in admins]
         notify_users.delay(email_list, 'create')
         return ProductResponse(**product.as_dict())
     except IntegrityError:

@@ -1,6 +1,6 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
-
+from app.db.models.user import UserRepository
 import jwt
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -64,7 +64,8 @@ def get_current_user(
             raise credentials_exception
     except InvalidTokenError:
         raise credentials_exception
-    user = db.query(User).filter(User.username == username).first()
+    user_repository = UserRepository(db)
+    user = user_repository.get_by_username(username)
     if user is None:
         raise credentials_exception
     return user

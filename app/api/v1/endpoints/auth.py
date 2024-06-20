@@ -1,5 +1,5 @@
 from typing import Annotated
-
+from app.helpers.helpers import validate_email
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -29,7 +29,10 @@ def login(
     Get an access token for the user
     """
     user_repository = UserRepository(db)
-    user = user_repository.get_by_username(form_data.username)
+    if validate_email(form_data.username):
+        user = user_repository.get_by_email(form_data.username)
+    else:
+        user = user_repository.get_by_username(form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -52,14 +55,15 @@ def register_user(
     Create a new user (admin only)
     """
     user_repository = UserRepository(db)
-    if user_repository.get_by_username(request.username):
+    if user_repository.get_by_username(request.username) or user_repository.get_by_email(request.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered",
+            detail="Username or Email already registered",
         )
 
     try:
         new_user = user_repository.create(
+            email=request.email,
             username=request.username,
             hashed_password=get_password_hash(request.password),
             is_active=request.is_active,

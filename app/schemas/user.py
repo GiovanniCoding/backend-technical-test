@@ -5,6 +5,7 @@ from typing import Optional
 
 class UserResponse(BaseModel):
     id: UUID
+    email: str
     username: str
     is_active: bool
     is_admin: bool
@@ -17,6 +18,7 @@ class UserDeletedResponse(BaseModel):
     deleted_at: datetime
 
 class PatchUserRequest(BaseModel):
+    email: Optional[str] = None
     username: Optional[str] = None
     is_active: Optional[bool] = None
     is_admin: Optional[bool] = None
@@ -24,6 +26,7 @@ class PatchUserRequest(BaseModel):
 
     def as_dict(self) -> dict:
         return {
+            'email': self.email,
             'username': self.username,
             'is_active': self.is_active,
             'is_admin': self.is_admin,

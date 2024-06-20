@@ -9,6 +9,7 @@ from app.db.models.base import BaseModel
 class User(BaseModel):
     __tablename__ = "users"
 
+    email = Column(String, unique=True, index=True, nullable=True)
     username = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
@@ -16,6 +17,7 @@ class User(BaseModel):
 
     def as_dict(self) -> dict[str, str | int | float | None]:
         return super().as_dict() | {
+            "email": self.email,
             "username": self.username,
             "is_active": self.is_active,
             "is_admin": self.is_admin,
@@ -27,9 +29,10 @@ class UserRepository:
         self.db = db
 
     def create(
-        self, username: str, hashed_password: str, is_active: bool, is_admin: bool
+        self, email: str, username: str, hashed_password: str, is_active: bool, is_admin: bool
     ) -> User:
         user = User(
+            email=email,
             username=username,
             hashed_password=hashed_password,
             is_active=is_active,
@@ -48,6 +51,9 @@ class UserRepository:
             User.is_admin == True,
             User.deleted_at == None
         ).all()
+
+    def get_by_email(self, email: str) -> User:
+        return self.db.query(User).filter(User.email == email).first()
 
     def get_by_username(self, username: str) -> User:
         return self.db.query(User).filter(User.username == username).first()
