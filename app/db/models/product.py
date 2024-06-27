@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 
 from app.db.models.base import BaseModel
 
-
 class Product(BaseModel):
     __tablename__ = "products"
 
